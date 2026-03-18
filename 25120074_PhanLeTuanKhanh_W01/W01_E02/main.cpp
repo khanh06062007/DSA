@@ -1,12 +1,11 @@
 #include<string>
 #include<iostream>
 #include"MyStack.h"
-using namespace std;
 int n;
-string s;
+std::string s;
 MyStack st;
 void module2_2(){
-    getline(cin,s);
+    getline(std::cin,s);
     n=s.size();
     initStack(st);
     for(int i=0;i<n;i++){
@@ -21,13 +20,13 @@ void module2_2(){
             break;
         }
     }
-    if(st.size==0)cout<<"true";
-    else cout<<"false";
+    if(st.size==0)std::cout<<"true";
+    else std::cout<<"false";
     clearStack(st);
-    cout<<'\n';
+    std::cout<<'\n';
 }
 void module2_3(){
-    getline(cin,s);
+    getline(std::cin,s);
     n=s.size();
     int res=0;
     MyStack pos;
@@ -43,14 +42,14 @@ void module2_3(){
         else if(!isEmpty(st) && top(st)==k-1){
             pop(st);
             pop(pos);
-            res=max(res,i-top(pos));
+            res=std::max(res,i-top(pos));
         }
         else{
             push(st,k);
             push(pos,i);
         }
     }
-    cout<<res;
+    std::cout<<res;
     clearStack(st);
     clearStack(pos);
 }
