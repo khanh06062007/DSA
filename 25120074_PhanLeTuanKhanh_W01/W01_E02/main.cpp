@@ -6,7 +6,7 @@ int n;
 string s;
 MyStack st;
 void module2_2(){
-    cin>>s;
+    getline(cin,s);
     n=s.size();
     initStack(st);
     for(int i=0;i<n;i++){
@@ -27,7 +27,7 @@ void module2_2(){
     cout<<'\n';
 }
 void module2_3(){
-    cin>>s;
+    getline(cin,s);
     n=s.size();
     int res=0;
     MyStack pos;
