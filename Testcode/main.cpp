@@ -1,56 +1,109 @@
-#include<iostream>
-#include<string>
-struct TreeNode{
-    std::string val;
+#include <iostream>
+#include <string>
+#include <stack>
+#include <fstream>
+
+using namespace std;
+
+struct TreeNode {
+    string val;
     TreeNode* left;
     TreeNode* right;
 };
-int evaluateTree(TreeNode* root){
-    if(root==nullptr)return 0;
-    if(root->left==nullptr && root->right==nullptr)return std::stoi(root->val);
-    int l=evaluateTree(root->left);    
-    int r=evaluateTree(root->right);
-    if(root->val=="+") return l+r;
-    if(root->val=="-") return l-r;
-    if(root->val=="*") return l*r;
-    if(root->val=="/"){
-        if(r==0){
-            std::cout<<"Error!\n";
-            return 0;
-        }
-        else return l/r;
-    }
+
+bool isOperator(const string& s) {
+    return s == "+" || s == "-" || s == "*" || s == "/";
 }
-std::string decodeString(const std::string &s,int &index){
-    int mul=1;
-    std::string res = "";
-    while(index<s.size()){
-        while((s[index]>='0' && s[index]<='9') || (s[index]>='a' && s[index]<='z')){
-            if ((s[index]>='0' && s[index]<='9'))
-                mul=s[index]-'0',index++;
-            else if(s[index]>='a' && s[index]<='z'){
-                for(int i=1;i<=mul;i++)
-                    res=res+s[index];
-                index++;    
+
+TreeNode* buildTree(ifstream& infile) {
+    string token;
+    if (!(infile >> token)) {
+        return nullptr;
+    }
+
+    TreeNode* node = new TreeNode;
+    node->val = token;
+    node->left = nullptr;
+    node->right = nullptr;
+
+    if (isOperator(token)) {
+        node->left = buildTree(infile);
+        node->right = buildTree(infile);
+    }
+
+    return node;
+}
+
+// --- YOUR CODE HERE ---
+int evaluateTreeIterative(TreeNode* root) {
+    stack<TreeNode*> node;
+    stack<int>val;
+    TreeNode *lastVisited = nullptr;;
+    TreeNode *cur = root;
+    while(!node.empty() || cur!=nullptr){
+        if(!cur){
+            node.push(cur);
+            cur = cur->left;
+        }
+        else{
+            TreeNode *peekNode = node.top();
+            if(peekNode->right && lastVisited!=peekNode->right){
+                cur = cur->right;
+            }
+            else{
+                if(!peekNode->left && !peekNode->right)
+                    val.push(stoi(peekNode->val));
+                else{
+                    int l = val.top();
+                    val.pop();
+                    int r = val.top();
+                    val.pop();
+                    if(peekNode->val=="+")
+                        val.push(l + r);
+                    else if(peekNode->val=="-")
+                        val.push(l - r);
+                    else if(peekNode->val=="*")
+                        val.push(l * r);
+                    else if(r==0){
+                        cout << "Error divided by 0!" << '\n';
+                        return -1;
+                    }
+                    else
+                        val.push(l / r);
+                }
+                lastVisited = peekNode;
+                node.pop();
             }
         }
-        if(s[index]=='['){
-            index++;
-            std::string p=decodeString(s,index);
-            for(int i=1;i<=mul;i++)
-            res=res+p;
-            mul=1;
-        }
-        if(s[index]==']'){
-            index++;
-            return res;
-        }
     }
-    return res;
+    return val.top();
 }
-int main(){
-    std::string s;
-    int index=0;
-    std::cin>>s;
-    std::cout<<decodeString(s,index);
+
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        cout << "Usage: ./main.exe <input_file_path> <output_file_path>" << endl;
+        return 1;
+    }
+
+    ifstream infile(argv[1]);
+    ofstream outfile(argv[2]);
+
+    if (!infile.is_open()) {
+        cout << "Error: Cannot open input file " << argv[1] << endl;
+        return 1;
+    }
+    if (!outfile.is_open()) {
+        cout << "Error: Cannot open output file " << argv[2] << endl;
+        return 1;
+    }
+
+    TreeNode* root = buildTree(infile);
+    int result = evaluateTreeIterative(root);
+
+    outfile << result << endl;
+    
+    infile.close();
+    outfile.close();
+
+    return 0;
 }

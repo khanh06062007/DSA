@@ -48,7 +48,7 @@ public:
         if (p == nullptr)
         {
             p = new node(key);
-            return;
+    return;
         }
         while (p)
         {
@@ -64,7 +64,7 @@ public:
         else
             prev->right = p;
         return;
-    }
+}
     void remove(int key)
     {
         node *z = search(key);
